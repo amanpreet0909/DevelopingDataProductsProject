@@ -1,0 +1,141 @@
+---
+title: "README"
+author: "Amanpreet Kaur"
+date: "Sunday, July 27, 2014"
+output: html_document
+---
+#Overview of App
+This document provides the bried description of the shiny app i built namely "Interactive Linear Models"..
+This app uses the R library inbuilt dataset mtcars.
+Using this app you can create a linear model of any of the variables in mtcars as predictor and miles per gallon as outcome.
+This app also shows the plot between miles per gallon and the predictor selected.
+
+#ui.r
+```{r}
+library(shiny)
+library(ggplot2)
+
+# Define UI for random distribution application 
+shinyUI(pageWithSidebar(
+
+  # Application title
+  headerPanel("Linear Models for mtcars"),
+
+  # Sidebar with controls to select the predictor variables.
+  # Note the use of the br()
+  # element to introduce extra vertical spacing
+  sidebarPanel(
+    textInput("outcome", "Outcome:", "Miles per Gallon"),
+    radioButtons("variable", "Select the Predictor Variables:",
+                 list("Number of Cylinders" = "cyl",
+                      "Displacement" = "disp",
+                      "Gross Horse Power" = "hp",
+                      "Rear Axle Ratio" = "drat",
+                      "Weight"="wt",
+                      "1/4 Mile Time"="qsec",
+                      "V/S"="vs",
+                      "Transmission"="am",
+                      "Number of front gears"="gear",
+                      "Number of carburetors"="carb")),
+    br())
+,
+  # Show a tabset that includes a plot, summary, and table view
+  # of the generated model.
+  mainPanel(
+    tabsetPanel(
+      tabPanel("ModelSummary", verbatimTextOutput("summary")),
+      tabPanel("Plot", plotOutput("plot"))
+    )
+  )
+))
+```
+You can select the predictor by pressing the radio button corresponding to the name of predictor.
+You can see the summary of model and plot on the R.H.S.
+
+#server.R
+```{r}
+library(shiny)
+library(ggplot2)
+library(datasets)
+# Define server logic for random distribution application
+shinyServer(function(input, output) {
+
+   # Generate a summary of the data
+  output$summary <- renderPrint({
+     if (input$variable == "am") {
+       fit<-lm(mpg ~ am,data=mtcars)
+     }
+     else if(input$variable=="disp"){
+       fit<-lm(mpg ~ disp,data=mtcars)
+     }
+    else if(input$variable=="hp"){
+      fit<-lm(mpg ~ hp,data=mtcars)
+     }
+    else if(input$variable=="drat"){
+      fit<-lm(mpg ~ drat,data=mtcars)
+     }
+    else if(input$variable=="wt"){
+      fit<-lm(mpg ~ wt,data=mtcars)
+     }
+   else if(input$variable=="qsec"){
+      fit<-lm(mpg ~ qsec,data=mtcars)
+     }
+   else if(input$variable=="vs"){
+      fit<-lm(mpg ~ vs,data=mtcars)
+     }
+   else if(input$variable=="cyl"){
+      fit<-lm(mpg ~ cyl,data=mtcars)
+     }
+   else if(input$variable=="gear"){
+     fit<-lm(mpg ~ gear,data=mtcars)
+     }
+   else if(input$variable=="carb"){
+      fit<-lm(mpg ~ carb,data=mtcars)
+}
+    summary(fit)
+  })
+
+   # Generate a plot of the data. Also uses the inputs to build the 
+  # plot label. Note that the dependencies on both the inputs and
+  # the 'data' reactive expression are both tracked, and all expressions 
+  # are called in the sequence implied by the dependency graph
+  output$plot <- renderPlot({
+    if (input$variable == "am") {
+       mpgData <- data.frame(mpg = mtcars$mpg, var = factor(mtcars[[input$variable]], labels = c("Automatic", "Manual")))
+     }
+     else if(input$variable=="disp"){
+        mpgData <- data.frame(mpg = mtcars$mpg, var = factor(mtcars[[input$variable]]))
+     }
+    else if(input$variable=="hp"){
+        mpgData <- data.frame(mpg = mtcars$mpg, var = factor(mtcars[[input$variable]]))
+     }
+    else if(input$variable=="drat"){
+      mpgData <- data.frame(mpg = mtcars$mpg, var = factor(mtcars[[input$variable]]))
+     }
+    else if(input$variable=="wt"){
+      mpgData <- data.frame(mpg = mtcars$mpg, var = factor(mtcars[[input$variable]]))
+     }
+   else if(input$variable=="qsec"){
+      mpgData <- data.frame(mpg = mtcars$mpg, var = factor(mtcars[[input$variable]]))
+     }
+   else if(input$variable=="vs"){
+      mpgData <- data.frame(mpg = mtcars$mpg, var = factor(mtcars[[input$variable]]))
+     }
+   else if(input$variable=="cyl"){
+      mpgData <- data.frame(mpg = mtcars$mpg, var = factor(mtcars[[input$variable]]))
+     }
+   else if(input$variable=="gear"){
+      mpgData <- data.frame(mpg = mtcars$mpg, var = factor(mtcars[[input$variable]]))
+     }
+   else if(input$variable=="carb"){
+     mpgData <- data.frame(mpg = mtcars$mpg, var = factor(mtcars[[input$variable]]))
+    }
+     p <- ggplot() + 
+       geom_point(aes(var,mpg),mpgData,color="blue") + 
+       xlab(input$variable)+ylab("mpg")
+     print(p)
+  })
+
+
+ })
+```
